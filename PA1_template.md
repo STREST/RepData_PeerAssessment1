@@ -1,15 +1,8 @@
----
-title: "Reproducible Research - Assignment 1"
-author: "Stefan from Holland"
-date: "Feb 03 2017"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research - Assignment 1
+Stefan from Holland  
+Feb 03 2017  
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+
 
 ## Introduciton
 
@@ -19,13 +12,15 @@ This assignment makes use of data from a personal activity monitoring device. Th
 
 We are now gonna read in the data:
 
-```{r,echo=TRUE}
+
+```r
 raw_data = read.csv("activity.csv")
 ```
 
 and process/transform it:
 
-```{r,echo=TRUE}
+
+```r
 data = raw_data[!is.na(raw_data$steps),]
 data$date=as.Date(data$date)
 ```
@@ -33,42 +28,66 @@ data$date=as.Date(data$date)
 ## Steps per day
 
 To calculate the steps per day:
-```{r,echo=TRUE}
+
+```r
 steps_per_day = aggregate(data$steps, by=list(data$date), FUN=sum)
 colnames(steps_per_day)=c("date","steps")
 ```
 
 and plot a histogram:
-```{r,echo=TRUE}
+
+```r
 hist(steps_per_day$steps,xlab='steps',main = 'Steps per Day')
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+
 To calculate the mean and median:
 
-```{r,echo=TRUE}
+
+```r
 mean(steps_per_day$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(steps_per_day$steps)
+```
+
+```
+## [1] 10765
 ```
 
 ## Average daily activity pattern
 
 To calcaulate the average steps per interval:
-```{r,echo=TRUE}
+
+```r
 steps_per_interval = aggregate(data$steps, by=list(data$interval), FUN=mean)
 colnames(steps_per_interval)=c("interval","steps")
 ```
 
 and plot the timeseties:
 
-```{r,echo=TRUE}
-plot(x=steps_per_interval$interval,y=steps_per_interval$steps,xlab = '',ylab='steps',type='l',main = 'Steps per Interval')
 
+```r
+plot(x=steps_per_interval$interval,y=steps_per_interval$steps,xlab = '',ylab='steps',type='l',main = 'Steps per Interval')
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
 The next 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps:
 
-```{r,echo=TRUE}
+
+```r
 steps_per_interval$interval[which.max(steps_per_interval$steps)]
+```
+
+```
+## [1] 835
 ```
 
 
@@ -77,13 +96,19 @@ steps_per_interval$interval[which.max(steps_per_interval$steps)]
 There are a number of days/intervals where there are missing values (coded as NA). The presence of missing days may introduce bias into some calculations or summaries of the data.
 
 The number of missing values in the dataset equals
-```{r,echo=TRUE}
+
+```r
 sum(is.na(raw_data$steps))
+```
+
+```
+## [1] 2304
 ```
 
 To fill up the missing values, we create a new dataset called data_nona
 
-```{r,echo=TRUE}
+
+```r
 data_nona = raw_data
 data_nona$date=as.Date(data_nona$date)
 data_nona$steps[is.na(data_nona$steps)] = mean(data_nona$steps,na.rm = TRUE)
@@ -91,18 +116,33 @@ data_nona$steps[is.na(data_nona$steps)] = mean(data_nona$steps,na.rm = TRUE)
 
 and show the histogram:
 
-```{r,echo=TRUE}
+
+```r
 steps_per_day = aggregate(data_nona$steps, by=list(data_nona$date), FUN=sum)
 colnames(steps_per_day)=c("date","steps")
 hist(steps_per_day$steps,xlab='steps',main = 'Steps per Day')
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
+
 
 and calculate mean and median:
 
-```{r,echo=TRUE}
+
+```r
 mean(steps_per_day$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(steps_per_day$steps)
+```
+
+```
+## [1] 10766.19
 ```
 
 we see that there is a minor difference of 1.19 steps in median
@@ -111,14 +151,12 @@ we see that there is a minor difference of 1.19 steps in median
 
 Next, we investigate patterns in weekday and weekends.
 
-```{r, echo=FALSE}
-sunday_in_local_language = weekdays(as.Date("2017-01-28"))
-saturday_in_local_language = weekdays(as.Date("2017-01-29"))
-```
+
 
 We create another factor, called 'weekday'
 
-```{r,echo=TRUE}
+
+```r
 data_nona_w = data_nona
 data_nona_w$weekday = 'weekday'
 data_nona_w$weekday[weekdays(data_nona_w$date) %in% c(sunday_in_local_language,saturday_in_local_language)] = 'weekend'
@@ -126,7 +164,8 @@ data_nona_w$weekday[weekdays(data_nona_w$date) %in% c(sunday_in_local_language,s
 
 to plot steps per interval for weekdays and weekends:
 
-```{r,echo=TRUE}
+
+```r
 data_nona_weekend = data_nona_w[data_nona_w$weekday=='weekend',]
 steps_per_day_weekend = aggregate(data_nona_weekend$steps, by=list(data_nona_weekend$interval), FUN=mean)
 colnames(steps_per_day_weekend)=c("interval","steps")
@@ -139,3 +178,5 @@ par(mfrow=c(2,1))
 plot(x=steps_per_day_weekend$interval,y=steps_per_day_weekend$steps,type='l',xlab = 'interval',ylab = 'steps',main='Steps per interval - weekend')
 plot(x=steps_per_day_weekday$interval,y=steps_per_day_weekday$steps,type='l',xlab = 'interval',ylab = 'steps',main='Steps per interval - weekdays')
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
